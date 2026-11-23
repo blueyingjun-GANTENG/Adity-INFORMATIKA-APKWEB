@@ -1,0 +1,674 @@
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MPK-OSIS NAWASENA</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Arial,sans-serif;background:#f3f6fc;color:#172554}
+button,input,textarea,select{font:inherit}
+button{cursor:pointer;border:0;border-radius:9px;padding:11px 15px;font-weight:bold}
+.primary{background:#3157c8;color:white}
+.secondary{background:#eaf0ff;color:#3157c8}
+.danger{background:#fff0f0;color:#b42318}
+.app{display:flex;min-height:100vh}
+.sidebar{width:245px;background:#172554;color:white;padding:22px 15px;flex-shrink:0}
+.brand{display:flex;align-items:center;gap:10px;margin-bottom:35px}
+.logo{width:45px;height:45px;background:white;color:#3157c8;border-radius:12px;display:grid;place-items:center;font-weight:bold}
+.brand h2{font-size:15px}
+.brand small{font-size:10px;color:#bdc9ef}
+.nav-title{font-size:10px;color:#9fb0df;margin:18px 10px}
+.nav button{width:100%;display:block;text-align:left;background:transparent;color:#dce4ff;margin-bottom:6px}
+.nav button:hover,.nav button.active{background:#293b77;color:white}
+.main{flex:1;min-width:0}
+.topbar{height:65px;background:white;border-bottom:1px solid #e7ebf3;display:flex;align-items:center;justify-content:space-between;padding:0 25px}
+.content{padding:25px;max-width:1250px;margin:auto}
+.page{display:none}
+.page.active{display:block}
+.head{margin-bottom:22px}
+.head small{color:#3157c8;font-weight:bold;letter-spacing:1px}
+.head h1{font-size:26px;margin:8px 0}
+.head p,.muted{font-size:13px;color:#71809d}
+.card{background:white;border:1px solid #e7ebf3;border-radius:14px;padding:20px;margin-bottom:17px;box-shadow:0 4px 15px #17255408}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:13px;margin-bottom:20px}
+.stat{background:white;padding:18px;border:1px solid #e7ebf3;border-radius:13px}
+.stat p{font-size:12px;color:#71809d}
+.stat h2{font-size:27px;margin-top:8px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.field{width:100%;padding:12px;border:1px solid #dfe5f0;border-radius:9px;margin-top:6px;outline:none}
+.field:focus{border-color:#3157c8}
+.form-group{margin-bottom:14px}
+.form-group label{font-size:12px;font-weight:bold}
+table{width:100%;border-collapse:collapse;margin-top:12px;min-width:450px}
+th,td{text-align:left;padding:12px;border-bottom:1px solid #e7ebf3;font-size:12px}
+th{color:#71809d}
+.table-wrap{overflow-x:auto}
+.folder-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:13px;margin-top:20px}
+.folder{background:white;border:1px solid #e7ebf3;padding:18px;border-radius:13px;cursor:pointer}
+.folder:hover{border-color:#3157c8}
+.folder-icon{font-size:30px;margin-bottom:10px}
+.folder p{font-size:12px;color:#71809d;margin-top:6px}
+.qr-area{display:flex;justify-content:center;align-items:center;min-height:220px;background:#f8faff;border:1px dashed #bdcafa;border-radius:12px;margin:15px 0;padding:15px}
+.hidden{display:none!important}
+.modal{display:none;position:fixed;inset:0;background:#0009;z-index:99;align-items:center;justify-content:center;padding:15px}
+.modal.show{display:flex}
+.modal-box{background:white;padding:22px;border-radius:15px;width:100%;max-width:480px;max-height:90vh;overflow:auto}
+.modal-box h3{margin-bottom:15px}
+.modal-actions{display:flex;gap:8px;margin-top:15px;flex-wrap:wrap}
+.badge{display:inline-block;padding:5px 9px;border-radius:20px;background:#eaf0ff;color:#3157c8;font-size:11px}
+@media(max-width:800px){
+.sidebar{width:68px;padding:15px 7px}
+.brand{justify-content:center}
+.brand h2,.brand small,.nav-title{display:none}
+.nav button{font-size:0;text-align:center;padding:14px 5px}
+.nav button::first-letter{font-size:18px}
+.content{padding:18px 12px}
+.stats{grid-template-columns:repeat(2,1fr)}
+.grid2{grid-template-columns:1fr}
+.folder-grid{grid-template-columns:repeat(2,1fr)}
+.topbar{padding:0 12px;font-size:12px}
+}
+@media(max-width:420px){.folder-grid{grid-template-columns:1fr}}
+</style>
+</head>
+
+<body>
+<div class="app">
+
+<aside class="sidebar">
+<div class="brand">
+<div class="logo">MO</div>
+<div>
+<h2>MPK-OSIS</h2>
+<small>NAWASENA</small>
+</div>
+</div>
+
+<div class="nav">
+<div class="nav-title">MENU UTAMA</div>
+<button class="active" onclick="showPage('dashboard',this)">⌂ Dashboard</button>
+<button onclick="showPage('attendance',this)">▦ Presensi QR</button>
+<button onclick="showPage('notes',this)">🗂 Lemari Notulen</button>
+<button onclick="showPage('members',this)">♙ Data Anggota</button>
+</div>
+</aside>
+
+<main class="main">
+<header class="topbar">
+<b id="topTitle">Dashboard</b>
+<span>MPK-OSIS NAWASENA</span>
+</header>
+
+<div class="content">
+
+<!-- DASHBOARD -->
+<section id="dashboard" class="page active">
+<div class="head">
+<small>SELAMAT DATANG</small>
+<h1>MPK-OSIS NAWASENA 👋</h1>
+<p>Platform administrasi dan dokumentasi organisasi.</p>
+</div>
+
+<div class="stats">
+<div class="stat"><p>Total Anggota</p><h2 id="totalMembers">35</h2></div>
+<div class="stat"><p>Sesi Presensi</p><h2 id="totalSessions">0</h2></div>
+<div class="stat"><p>Total Notulen</p><h2 id="totalNotes">0</h2></div>
+<div class="stat"><p>Folder Rapat</p><h2 id="totalFolders">3</h2></div>
+</div>
+
+<div class="grid2">
+<div class="card">
+<h3>Profil Organisasi</h3>
+<br>
+<h2>MPK-OSIS NAWASENA</h2>
+<p class="muted">SMAS Diponegoro Tumpang</p>
+<br>
+<p class="muted">Satu ruang digital untuk presensi, administrasi, dan dokumentasi rapat.</p>
+</div>
+<div class="card">
+<h3>Akses Cepat</h3><br>
+<button class="primary" onclick="showPage('attendance')">Buat Presensi</button>
+<button class="secondary" onclick="showPage('notes')">Buka Notulen</button>
+<button class="secondary" onclick="showPage('members')">Data Anggota</button>
+</div>
+</div>
+</section>
+
+<!-- PRESENSI -->
+<section id="attendance" class="page">
+<div class="head">
+<small>KEHADIRAN ORGANISASI</small>
+<h1>Presensi QR Code</h1>
+<p>Buat QR Code untuk sesi rapat dan catat kehadiran anggota.</p>
+</div>
+
+<div class="grid2">
+<div class="card">
+<h3>Buat Sesi Presensi</h3><br>
+<div class="form-group">
+<label>Nama Kegiatan</label>
+<input id="sessionName" class="field" placeholder="Nama rapat atau kegiatan">
+</div>
+<div class="form-group">
+<label>Tanggal</label>
+<input type="date" id="sessionDate" class="field">
+</div>
+<button class="primary" onclick="createSession()">Buat QR Code</button>
+
+<div id="qrResult" class="hidden">
+<div class="qr-area"><div id="sessionQR"></div></div>
+<p id="sessionInfo" class="muted"></p><br>
+<button class="secondary" onclick="downloadSessionQR()">Unduh QR</button>
+</div>
+</div>
+
+<div class="card">
+<h3>Catat Kehadiran</h3><br>
+<div class="form-group">
+<label>Kode Sesi</label>
+<input id="attendanceCode" class="field" placeholder="Masukkan kode sesi">
+</div>
+<div class="form-group">
+<label>Nama Anggota</label>
+<input id="attendanceName" class="field" placeholder="Nama sesuai database">
+</div>
+<button class="primary" onclick="submitAttendance()">Catat Kehadiran</button>
+<p id="attendanceMessage" class="muted" style="margin-top:12px"></p>
+</div>
+</div>
+
+<div class="card">
+<h3>Riwayat Presensi</h3>
+<div class="table-wrap">
+<table>
+<thead><tr><th>Kegiatan</th><th>Tanggal</th><th>Kode</th><th>Hadir</th></tr></thead>
+<tbody id="sessionTable"></tbody>
+</table>
+</div>
+</div>
+</section>
+
+<!-- NOTULEN -->
+<section id="notes" class="page">
+<div class="head">
+<small>ARSIP ORGANISASI</small>
+<h1>Lemari Notulen 🗂️</h1>
+<p>Tempat menyimpan dokumen hasil rapat MPK-OSIS.</p>
+</div>
+
+<button class="primary" onclick="createFolder()">+ Buat Folder</button>
+<button class="secondary" onclick="createNote()">+ Tambah Notulen</button>
+
+<div id="folderGrid" class="folder-grid"></div>
+
+<div id="folderDetail" class="card hidden" style="margin-top:20px">
+<h3 id="folderTitle"></h3><br>
+<div id="noteList"></div>
+<br>
+<button class="secondary" onclick="closeFolder()">Kembali</button>
+</div>
+</section>
+
+<!-- DATA ANGGOTA -->
+<section id="members" class="page">
+<div class="head">
+<small>DATABASE ORGANISASI</small>
+<h1>Data Anggota MPK-OSIS</h1>
+<p>Database anggota dan QR Code pribadi.</p>
+</div>
+
+<input class="field" id="memberSearch" placeholder="Cari nama anggota..." oninput="renderMembers()">
+<br><br>
+<button class="primary" onclick="addMember()">+ Tambah Anggota</button>
+<button class="secondary" onclick="printAllQR()">Cetak Semua QR</button>
+
+<div class="card" style="margin-top:18px">
+<div class="table-wrap">
+<table>
+<thead><tr><th>Nama</th><th>Kelas</th><th>Jabatan</th><th>QR</th></tr></thead>
+<tbody id="memberTable"></tbody>
+</table>
+</div>
+</div>
+</section>
+
+</div>
+</main>
+</div>
+
+<!-- MODAL QR -->
+<div class="modal" id="qrModal">
+<div class="modal-box" style="text-align:center">
+<h3>QR Code Anggota</h3>
+<div id="memberQR" class="qr-area"></div>
+<h3 id="qrMemberName"></h3>
+<p id="qrMemberInfo" class="muted"></p>
+<div class="modal-actions">
+<button class="primary" onclick="downloadMemberQR()">Unduh QR</button>
+<button class="secondary" onclick="closeQR()">Tutup</button>
+</div>
+</div>
+</div>
+
+<script>
+/* DATABASE ANGGOTA */
+
+const defaultMembers=[
+["Salsa Bila","X-A"],
+["Wisnu Dwi K. Z.","X-A"],
+["Sella Rachma Letisya","X-B"],
+["Himaya Kamila","X-C"],
+["Karuniya","X-C"],
+["Amelia Febrianisya Putri","X-C"],
+["Muhamad Rif'ad Al-Mubaroq","X-C"],
+["Haura' Hilyatul Dafan","X-D"],
+["Adhe Nadhifatus Sani","X-D"],
+["Clara Novabel Radhista","X-E"],
+["Beny Rahma Dani","X-E"],
+["M Kholikul Ariskian Ahlisin","X-E"],
+["Alif Ardiansyah","X-F"],
+["Zeva Faisya Putri","X-F"],
+["Yurisa Amelya","X-G"],
+["Tsalista Ayu Ramadhani Rinata","X-H"],
+["Sabrina Roviannisa","X-H"],
+["Mochammad Hafiedz Syahrizal","X-H"],
+["Almyra Ramadani","X-H"],
+["Amadea Az Zahra Amanalloh","XI-A"],
+["Sabrira Maisayu Nabila","XI-A"],
+["Sofy Ayunda Putri","XI-A"],
+["Quthrotunnada Mauliya Fasya","XI-A"],
+["Puji Anggi Citra Rahelia","XI-A"],
+["Siti Syafa'atul Rofitri","XI-A"],
+["Zylzalla Ceasa Novra Azahra W.","XI-B"],
+["Davi Satria Yuda P","XI-B"],
+["Aliyah Alimatus Sakinah","XI-B"],
+["Odingli Olifia Prasetyo","XI-C"],
+["Kingshe Joy Moriyel Junaedi","XI-C"],
+["Fransisca Anggita Febriyanto","XI-C"],
+["Muhammad Aditya Arianto","XI-C"],
+["Ziya Oki Ananta Santi","XI-D"],
+["Muhammad Azka Ainuz Zamzami","XI-E"],
+["Asma Maulidia Tuzahra","XI-E"]
+];
+
+function load(key,fallback){
+try{
+const x=localStorage.getItem("nawasena_"+key);
+return x?JSON.parse(x):fallback;
+}catch(e){return fallback}
+}
+function save(key,value){
+localStorage.setItem("nawasena_"+key,JSON.stringify(value));
+}
+
+let members=load("members",defaultMembers.map((m,i)=>({
+id:"NAWA"+String(i+1).padStart(3,"0"),
+name:m[0],className:m[1],role:""
+})));
+
+let sessions=load("sessions",[]);
+let folders=load("folders",[
+{id:"F1",name:"Rapat Umum"},
+{id:"F2",name:"Rapat Pengurus Inti"},
+{id:"F3",name:"Rapat Komisi"}
+]);
+let notes=load("notes",[]);
+let activeFolder=null;
+let currentQR=null;
+let currentMember=null;
+
+function esc(v){
+return String(v??"").replace(/[&<>"']/g,c=>({
+"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+}[c]));
+}
+
+/* NAVIGASI */
+
+function showPage(id,button){
+document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
+document.getElementById(id).classList.add("active");
+document.querySelectorAll(".nav button").forEach(b=>b.classList.remove("active"));
+if(button)button.classList.add("active");
+const titles={dashboard:"Dashboard",attendance:"Presensi QR",notes:"Lemari Notulen",members:"Data Anggota"};
+document.getElementById("topTitle").textContent=titles[id];
+if(id==="members")renderMembers();
+if(id==="attendance")renderSessions();
+if(id==="notes")renderFolders();
+updateDashboard();
+}
+
+/* DASHBOARD */
+
+function updateDashboard(){
+document.getElementById("totalMembers").textContent=members.length;
+document.getElementById("totalSessions").textContent=sessions.length;
+document.getElementById("totalNotes").textContent=notes.length;
+document.getElementById("totalFolders").textContent=folders.length;
+}
+
+/* ANGGOTA */
+
+function renderMembers(){
+const search=(document.getElementById("memberSearch")?.value||"").toLowerCase();
+const filtered=members.filter(m=>(m.name+" "+m.className+" "+m.role).toLowerCase().includes(search));
+document.getElementById("memberTable").innerHTML=filtered.map(m=>`
+<tr>
+<td><b>${esc(m.name)}</b></td>
+<td>${esc(m.className)}</td>
+<td>${esc(m.role||"-")}</td>
+<td><button class="secondary" onclick="showMemberQR('${m.id}')">QR Code</button></td>
+</tr>`).join("");
+}
+
+function addMember(){
+const name=prompt("Nama lengkap anggota:");
+if(!name?.trim())return;
+const cls=prompt("Kelas anggota:");
+if(!cls?.trim())return;
+const role=prompt("Jabatan anggota (boleh dikosongkan):")||"";
+members.push({
+id:"NAWA"+Date.now(),
+name:name.trim(),
+className:cls.trim(),
+role:role.trim()
+});
+save("members",members);
+renderMembers();updateDashboard();
+alert("Anggota berhasil ditambahkan!");
+}
+
+/* QR ANGGOTA */
+
+function memberPayload(m){
+return JSON.stringify({
+app:"MPK-OSIS NAWASENA",
+type:"member",
+id:m.id,
+name:m.name,
+className:m.className
+});
+}
+
+function showMemberQR(id){
+const m=members.find(x=>x.id===id);
+if(!m)return;
+if(!window.QRCode)return alert("QR membutuhkan koneksi internet.");
+currentMember=m;
+const target=document.getElementById("memberQR");
+target.innerHTML="";
+new QRCode(target,{text:memberPayload(m),width:190,height:190});
+document.getElementById("qrMemberName").textContent=m.name;
+document.getElementById("qrMemberInfo").textContent=m.className+" | "+m.id;
+document.getElementById("qrModal").classList.add("show");
+}
+
+function closeQR(){
+document.getElementById("qrModal").classList.remove("show");
+}
+
+function downloadMemberQR(){
+const canvas=document.querySelector("#memberQR canvas");
+if(!canvas)return alert("QR belum tersedia.");
+const a=document.createElement("a");
+a.href=canvas.toDataURL("image/png");
+a.download="QR-"+currentMember.name.replace(/[^a-z0-9]/gi,"-")+".png";
+a.click();
+}
+
+function printAllQR(){
+if(!members.length)return;
+const win=window.open("","_blank");
+if(!win)return alert("Izinkan pop-up browser.");
+const payloads=JSON.stringify(members.map(m=>memberPayload(m)));
+const cards=members.map((m,i)=>`
+<div class="item">
+<div id="q${i}"></div>
+<h4>${esc(m.name)}</h4>
+<p>${esc(m.className)}</p>
+<small>${esc(m.id)}</small>
+</div>`).join("");
+
+win.document.write(`
+<html><head><title>QR Anggota NAWASENA</title>
+<style>
+body{font-family:Arial;text-align:center;color:#172554}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.item{border:1px solid #ddd;padding:10px;break-inside:avoid}
+.item h4{font-size:12px}.item p,.item small{font-size:10px}
+@page{size:A4;margin:10mm}
+</style></head><body>
+<h2>MPK-OSIS NAWASENA</h2>
+<p>Kartu QR Code Anggota</p>
+<div class="grid">${cards}</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"><\/script>
+<script>
+const data=${payloads};
+function make(){
+if(!window.QRCode){setTimeout(make,300);return}
+data.forEach((v,i)=>new QRCode(document.getElementById("q"+i),{text:v,width:120,height:120}));
+setTimeout(()=>window.print(),1200);
+}
+make();
+<\/script>
+</body></html>`);
+win.document.close();
+}
+
+/* PRESENSI */
+
+function createSession(){
+const name=document.getElementById("sessionName").value.trim();
+const date=document.getElementById("sessionDate").value;
+if(!name||!date)return alert("Isi nama kegiatan dan tanggal.");
+if(!window.QRCode)return alert("QR membutuhkan koneksi internet.");
+
+const code="NAWA-"+Math.random().toString(36).substring(2,8).toUpperCase();
+const session={id:code,name,date,attendees:[]};
+sessions.unshift(session);
+save("sessions",sessions);
+
+const target=document.getElementById("sessionQR");
+target.innerHTML="";
+new QRCode(target,{text:code,width:190,height:190});
+document.getElementById("qrResult").classList.remove("hidden");
+document.getElementById("sessionInfo").textContent=name+" | "+date+" | "+code;
+document.getElementById("attendanceCode").value=code;
+currentQR=code;
+renderSessions();updateDashboard();
+}
+
+function downloadSessionQR(){
+const canvas=document.querySelector("#sessionQR canvas");
+if(!canvas)return alert("QR belum tersedia.");
+const a=document.createElement("a");
+a.href=canvas.toDataURL("image/png");
+a.download="QR-Presensi-NAWASENA.png";
+a.click();
+}
+
+function submitAttendance(){
+const code=document.getElementById("attendanceCode").value.trim().toUpperCase();
+const name=document.getElementById("attendanceName").value.trim();
+if(!code||!name)return alert("Isi kode sesi dan nama anggota.");
+
+const session=sessions.find(s=>s.id===code);
+if(!session)return alert("Kode sesi tidak ditemukan.");
+
+const member=members.find(m=>m.name.toLowerCase()===name.toLowerCase());
+if(!member)return alert("Nama tidak ditemukan dalam database.");
+
+if(session.attendees.includes(member.id))return alert("Anggota sudah presensi.");
+
+session.attendees.push(member.id);
+save("sessions",sessions);
+document.getElementById("attendanceMessage").textContent="Presensi berhasil dicatat!";
+document.getElementById("attendanceName").value="";
+renderSessions();updateDashboard();
+}
+
+function renderSessions(){
+const table=document.getElementById("sessionTable");
+if(!sessions.length){
+table.innerHTML='<tr><td colspan="4">Belum ada sesi presensi.</td></tr>';
+return;
+}
+table.innerHTML=sessions.map(s=>`
+<tr>
+<td>${esc(s.name)}</td>
+<td>${esc(s.date)}</td>
+<td>${esc(s.id)}</td>
+<td>${s.attendees.length} orang</td>
+</tr>`).join("");
+}
+
+/* LEMARI FOLDER */
+
+function renderFolders(){
+document.getElementById("folderGrid").innerHTML=folders.map(f=>`
+<div class="folder" onclick="openFolder('${f.id}')">
+<div class="folder-icon">📁</div>
+<b>${esc(f.name)}</b>
+<p>${notes.filter(n=>n.folder===f.id).length} dokumen notulen</p>
+</div>`).join("");
+}
+
+function createFolder(){
+const name=prompt("Nama folder rapat:");
+if(!name?.trim())return;
+folders.push({id:"F"+Date.now(),name:name.trim()});
+save("folders",folders);renderFolders();updateDashboard();
+}
+
+function openFolder(id){
+activeFolder=id;
+const f=folders.find(x=>x.id===id);
+if(!f)return;
+document.getElementById("folderDetail").classList.remove("hidden");
+document.getElementById("folderTitle").textContent="📁 "+f.name;
+renderNotes();
+document.getElementById("folderDetail").scrollIntoView({behavior:"smooth"});
+}
+
+function closeFolder(){
+activeFolder=null;
+document.getElementById("folderDetail").classList.add("hidden");
+}
+
+/* MENAMBAH NOTULEN */
+
+function createNote(){
+if(!folders.length)return alert("Buat folder terlebih dahulu.");
+
+const title=prompt("Judul rapat:");
+if(!title?.trim())return;
+
+const options=folders.map((f,i)=>i+". "+f.name).join("\n");
+const choice=prompt("Pilih nomor folder:\n"+options,"0");
+if(choice===null)return;
+const index=Number(choice);
+if(!Number.isInteger(index)||index<0||index>=folders.length)return alert("Folder tidak valid.");
+
+const date=prompt("Tanggal rapat (YYYY-MM-DD):",new Date().toISOString().slice(0,10));
+if(!date)return;
+const author=prompt("Nama notulis:")||"";
+const agenda=prompt("Agenda rapat:")||"";
+const discussion=prompt("Pembahasan rapat:")||"";
+const decisions=prompt("Keputusan rapat:")||"";
+const followup=prompt("Tindak lanjut:")||"";
+
+notes.unshift({
+id:"N"+Date.now(),
+title:title.trim(),
+folder:folders[index].id,
+date,author,agenda,discussion,decisions,followup
+});
+
+save("notes",notes);
+renderFolders();renderNotes();updateDashboard();
+alert("Notulen berhasil disimpan!");
+}
+
+function renderNotes(){
+const selected=notes.filter(n=>n.folder===activeFolder);
+const list=document.getElementById("noteList");
+
+if(!selected.length){
+list.innerHTML="<p class='muted'>Folder masih kosong.</p>";
+return;
+}
+
+list.innerHTML=selected.map(n=>`
+<div class="card">
+<h3>${esc(n.title)}</h3>
+<p class="muted" style="margin:8px 0">Tanggal: ${esc(n.date)} | Notulis: ${esc(n.author)}</p>
+<button class="secondary" onclick="readNote('${n.id}')">Buka Notulen</button>
+<button class="danger" onclick="deleteNote('${n.id}')">Hapus</button>
+</div>`).join("");
+}
+
+function readNote(id){
+const n=notes.find(x=>x.id===id);
+if(!n)return;
+const content=`
+MPK-OSIS NAWASENA
+NOTULEN RAPAT
+
+Judul: ${n.title}
+Tanggal: ${n.date}
+Notulis: ${n.author}
+
+AGENDA:
+${n.agenda}
+
+PEMBAHASAN:
+${n.discussion}
+
+KEPUTUSAN:
+${n.decisions}
+
+TINDAK LANJUT:
+${n.followup}`;
+
+const win=window.open("","_blank");
+if(!win)return alert(content);
+
+win.document.write(`
+<html><head><title>Notulen Rapat</title>
+<style>
+body{font-family:Arial;max-width:800px;margin:35px auto;padding:20px;line-height:1.7}
+pre{white-space:pre-wrap;font-family:Arial}
+</style></head><body>
+<h2 style="text-align:center">MPK-OSIS NAWASENA</h2>
+<pre>${esc(content)}</pre>
+<button onclick="window.print()">Cetak Notulen</button>
+</body></html>`);
+win.document.close();
+}
+
+function deleteNote(id){
+if(!confirm("Yakin ingin menghapus notulen?"))return;
+notes=notes.filter(n=>n.id!==id);
+save("notes",notes);
+renderNotes();renderFolders();updateDashboard();
+}
+
+/* INISIALISASI */
+
+function initialize(){
+renderMembers();
+renderSessions();
+renderFolders();
+updateDashboard();
+document.getElementById("sessionDate").value=new Date().toISOString().slice(0,10);
+}
+
+initialize();
+
+</script>
+</body>
+</html>
